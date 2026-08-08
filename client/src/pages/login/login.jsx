@@ -1,5 +1,6 @@
 
 import  background from "../../assets/ocean.jpg";
+import {Link} from "react-router-dom";
 function Login(){
     return(
 <div>
@@ -23,17 +24,19 @@ function Login(){
    </div>
 
    <div className="flex justify-end items-end text-sm text-gray-600 my-2 hover:text-blue-500 hover:cursor-pointer hover:underline underline-offset-4">
-     <p> forget your password?</p>
+     <Link to="/forgetpassword" className="text-blue-500 hover:underline">Forget Password?</Link>
+   
    </div>
    
  <div className="flex justify-center items-center mx-auto my-16 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 w-44 rounded">
     <button type="submit" >
-      Submit
+      <Link to="/loginotp">
+      Submit</Link>
     </button>
    </div>
 
    <div>
-    <p>Don't have an account? <a href="/signup" className="text-blue-500 hover:underline">Sign up</a></p>
+    <p>Don't have an account? <Link to="/signup" className="text-blue-500 hover:underline">Sign up</Link></p>
    </div>
     
   </form>
