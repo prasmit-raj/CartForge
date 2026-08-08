@@ -25,7 +25,7 @@ function Signup(){
    
  <div className="flex justify-center items-center mx-auto my-16 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 w-44 rounded">
     <button type="submit" >
-      Create Account
+     <Link to="/signupotp">Create account</Link>
     </button>
    </div>
 
