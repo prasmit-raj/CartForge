@@ -1,6 +1,10 @@
 import {   Routes, Route } from "react-router-dom";
 
 import Home from "../pages/home/home";
+import Privacy from "../pages/footer/privacy";
+import Terms from "../pages/footer/terms";
+import Contact from "../pages/footer/contact";
+
 import Login from "../pages/login/login";
 import Signup from "../pages/signup/signup";
 
@@ -17,6 +21,11 @@ function App() {
    
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/contact" element={<Contact />} />
+
+
         <Route path="/login" element={<Login />} />
         <Route path="/loginotp" element={<Loginotp />} />
         <Route path="/signupotp" element={<Signupotp />} />

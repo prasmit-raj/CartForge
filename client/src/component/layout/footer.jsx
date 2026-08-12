@@ -1,3 +1,5 @@
+import {Link} from "react-router-dom";
+
 function Footer(){
 
     return(
@@ -5,9 +7,9 @@ function Footer(){
       <footer className="flex item-center justify-between bg-gray-800 text-white px-8 py-12">
 
   <ul>
-               <li className="my-2 hover:text-sky-400  hover:scale-110 transition-all duration-200 hover:underline underline-offset-4"><a href="#">Privacy Policy</a></li>
-              <li className="my-2 hover:text-sky-400  hover:scale-110 transition-all duration-200 hover:underline underline-offset-4"><a href="#">Terms of Service</a></li>
-              <li className="my-2 hover:text-sky-400  hover:scale-110 transition-all duration-200 hover:underline underline-offset-4"><a href="#">Contact Us</a></li>
+               <li className="my-2 hover:text-sky-400  hover:scale-110 transition-all duration-200 hover:underline underline-offset-4"><Link to="/privacy">Privacy Policy</Link></li>
+              <li className="my-2 hover:text-sky-400  hover:scale-110 transition-all duration-200 hover:underline underline-offset-4"><Link to="/terms">Terms of Service</Link></li>
+              <li className="my-2 hover:text-sky-400  hover:scale-110 transition-all duration-200 hover:underline underline-offset-4"><Link to="/contact">Contact Us</Link></li>
 
 
 
