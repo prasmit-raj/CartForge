@@ -1,8 +1,9 @@
 import  background from "../../assets/ocean.jpg";
 import { useNavigate, Link} from "react-router-dom";
 import { useState } from "react";
+import { signup } from "../../service/authservice";
 function Signup(){
-   // const navigate = useNavigate();
+    const navigate = useNavigate();
     const [email,setemail]=useState("");
     const [password,setpassword]=useState("");
     const [error,seterror]=useState("");
@@ -18,8 +19,18 @@ function Signup(){
             seterror("Please enter a valid email address");
             return;
           }
+    try{
+      const result= await signup({email,password});
+      console.log(result);
+      navigate("/loginotp");
+    }
+    catch(error){
+      seterror(error.message);
 
     }
+    }
+
+
 
     return (
         <div>

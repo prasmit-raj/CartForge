@@ -2,6 +2,7 @@
 import  background from "../../assets/ocean.jpg";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { login } from "../../service/authservice";
 
 function Login(){
 
@@ -14,6 +15,8 @@ function Login(){
     
     e.preventDefault();
 
+    useState("");
+
    if(!email || !password){
     seterror("Please fill in all fields");
     return;
@@ -23,10 +26,20 @@ function Login(){
     seterror("Please enter a valid email address");
     return;
   }
+
+  try{
+    const result =await login({email,password});
+    console.log(result);
+    navigate("/loginotp");
+   }
+   catch(error){
+    seterror(error.message);
+   }
+  }
    
  
 
-   }
+   
 
     return(
 <div>
