@@ -1,8 +1,32 @@
 
 import  background from "../../assets/ocean.jpg";
-import {Link} from "react-router-dom";
+import { useNavigate, Link} from "react-router-dom";
+import { useState } from "react";
+import { signupotp } from "../../service/authservice";
+import { verifyloginotp } from "../../service/authservice";
 
 function Signupotp(){
+ 
+    const navigate= useNavigate();
+    const [otp, setOtp]= useState("");
+    const [email, setEmail] = useState("");
+    const [error, setError] = useState("");
+
+    const handleSubmit=async(e)=>{
+         e.preventDefault();
+         if(!otp){
+            setError("Please enter the OTP");
+         }
+         try{
+            const result =await verifysignupotp({email,otp});
+            console.log(result);
+            navigate("/dashboard");
+         }
+         catch(erro){
+            setError(error.message);         }
+
+    }
+
     return (
 
           <div>
