@@ -1,7 +1,22 @@
 import  background from "../../assets/ocean.jpg";
-import {Link} from "react-router-dom";
+import { useNavigate, Link} from "react-router-dom";
+import { useState } from "react";
+import { loginotp } from "../../service/authservice";
 
 function Loginotp(){
+    const navigate = useNavigate();
+    const [otp, setOtp] = useState("");
+    const [error, setError] = useState("");
+        
+    const handleSubmit=(e)=>{
+        e.preventDefault();
+        if(!otp){
+            setError("Please enter the OTP");
+            return;
+        }
+        // Add logic to submit OTP
+    }
+
     return (
 
           <div>
