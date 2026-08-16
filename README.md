@@ -2,8 +2,7 @@
 
 A full-stack eCommerce web application for clothing built to learn how modern online shopping platforms work. The project focuses on understanding full-stack development, backend architecture, authentication, database design, and scalable application structure rather than just building a UI.
 
-> **Project Status:** 🚧 Currently Under Development
-
+> *client link: https://cart-forge.vercel.app/
 ---
 
 # About the Project
