@@ -1,163 +1,103 @@
-const API_URL = "http://localhost:5000/api";
+import { apiRequest } from "./api";
 
 
+
+// login function
 export  const login =async (data)=>{
-     const response= await fetch(`${API_URL}/auth/login`,{
-        method:"post",
-        headers:{
-            "content-type":"application/json"
-        },
-        body:JSON.stringify(data),
-     })
+      return apiRequest("/auth/login", {
+        method: "POST",
+        body: JSON.stringify(data)
+    });
      
-const result= await response.json();
-if(!response.ok){
-    throw new Error(result.message || "Failed to login");
-}
-return result;
-}
 
+};
+
+// signup function
 export const signup= async(data)=>{
-    const response =await fetch( `${API_URL}/auth/signup`,{
-        method:"post",
-        headers:{
-            "content-type":"application/json"
-        },
-        body:JSON.stringify(data),
-        })
+   return apiRequest("/auth/signup", {
+        method: "POST",
+        body: JSON.stringify(data)
+    });
 
-        const result= await response.json();
-        if(!response.ok){
-            throw new Error(result.message || "Failed to signup");
-        }
-        return result;
-    }
+    };
 
 
-
+// logout function
 export const logout = async()=>{
-    const response =await fetch (`${API_URL}/auth/logout`,{
-        method:"post",
-        headers:{
-            "content-type":"application/json"
-        },
-        body:JSON.stringify({})
-    })
-    const result=await response.json();
-    if(!response.ok){
-        throw new Error(result.message || "Failed to logout");
-    }
-    return result;
-}
+    return apiRequest("/auth/logout", {
+        method: "POST",
+        body: JSON.stringify({}),
 
+    });
+
+};
+
+//login with otp
 export const loginotp = async(data)=>{
-    const response =await fetch(`${API_URL}/auth/loginotp`,{
-        method:"post",
-        headers:{
-            "content-type":"application/json"
-        },
-        body:JSON.stringify(data)
-    })
+    return apiRequest("/auth/loginotp", {
+        method: "POST",
+        body: JSON.stringify(data)
+    });
 
-    const result=await response.json();
-    if(!response.ok){
-        throw new Error(result.message || "Failed to send login OTP");
-    }
-    return result;
-}
+};
+
+//verify login otp
+
 
 export const verifyloginotp = async(data)=>{
-    const response =await fetch(`${API_URL}/auth/verifyloginotp`,{
-        method:"post",
-        headers:{
-            "content-type":"application/json"
-        },
-        body:JSON.stringify(data)
-    })
+      return apiRequest("/auth/verifyloginotp", {
+        method: "POST",
+        body: JSON.stringify(data)
+    });
 
-    const result=await response.json();
-    if(!response.ok){
-        throw new Error(result.message || "Failed to verify login OTP");
-    }
-    return result;
+
+
 }
 
+//signup with otp
 export const signupotp = async(data)=>{
-    const response =await fetch(`${API_URL}/auth/signupotp`,{
-        method:"post",
-        headers:{
-            "content-type":"application/json"
-        },
-        body:JSON.stringify(data)
-    })
+    return apiRequest("/auth/signupotp", {
+        method: "POST",
+        body: JSON.stringify(data)
+    });
 
-    const result=await response.json();
-    if(!response.ok){
-        throw new Error(result.message || "Failed to send signup OTP");
-    }
-    return result;
-}
+};
+
+    //verify signup otp
 
 export const verifysignupotp = async(data)=>{
-    const response =await fetch(`${API_URL}/auth/verifysignupotp`,{
-        method:"post",
-        headers:{
-            "content-type":"application/json"
-        },
-        body:JSON.stringify(data)
-    })
+    return apiRequest("/auth/verifysignupotp", {
+        method: "POST",
+        body: JSON.stringify(data)
+    });
 
-    const result=await response.json();
-    if(!response.ok){
-        throw new Error(result.message || "Failed to verify signup OTP");
-    }
-    return result;
-}
+};
+
+       //forgot password otp
 
 export const sendforgotpasswordotp = async(data)=>{
-    const response =await fetch(`${API_URL}/auth/sendforgotpasswordotp`,{
-        method:"post",
-        headers:{
-            "content-type":"application/json"
-        },
-        body:JSON.stringify(data)
-    })
+    return apiRequest("/auth/sendforgotpasswordotp", {
+        method: "POST",
+        body: JSON.stringify(data)
+    });
 
-    const result=await response.json();
-    if(!response.ok){
-        throw new Error(result.message || "Failed to send forgot password OTP");
-    }
-    return result;
-}
+};
+
+      //verify forgot password otp
 
 export const verifyforgotpasswordotp = async(data)=>{
-    const response =await fetch(`${API_URL}/auth/verifyforgotpasswordotp`,{
-        method:"post",
-        headers:{
-            "content-type":"application/json"
-        },
-        body:JSON.stringify(data)
-    })
+    return apiRequest("/auth/verifyforgotpasswordotp", {
+        method: "POST",
+        body: JSON.stringify(data)
+    });
 
-    const result=await response.json();
-    if(!response.ok){
-        throw new Error(result.message || "Failed to verify forgot password OTP");
-    }
-    return result;
-}
+};
+      
 
 export const resetpassword = async(data)=>{
-    const response =await fetch(`${API_URL}/auth/resetpassword`,{
-        method:"post",
-        headers:{
-            "content-type":"application/json"
-        },
-        body:JSON.stringify(data)
-    })
-
-    const result=await response.json();
-    if(!response.ok){
-        throw new Error(result.message || "Failed to reset password");
-    }
-    return result;
-}
+    return apiRequest("/auth/resetpassword", {
+        method: "POST",
+        body: JSON.stringify(data)
+    });
+ 
+};

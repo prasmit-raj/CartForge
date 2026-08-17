@@ -1,13 +1,27 @@
-const express=require('express');
+const express = require("express");
+const cors = require("cors");
+require("dotenv").config();
 
-const app=express();
+const app = express();
 
-app.get('/',(req,res)=>{
-    res.send(' backend is running');
-})
+const PORT = 5000;
 
+// Middleware
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}));
 
-const PORT=5000;
-app.listen(PORT,()=>{
-    console.log(`server is running on http://localhost:${PORT}`);
-})
+app.use(express.json());
+
+// Test route
+app.get("/", (req, res) => {
+  res.json({
+    message: "CartForge backend is running"
+  });
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`CartForge server running on http://localhost:${PORT}`);
+});
