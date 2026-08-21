@@ -15,6 +15,12 @@ import Loginotp from "../pages/login/loginotp";
 import Signupotp from "../pages/signup/signupotp";
 
 import Dashboard from "../pages/dashboard/dashboard";
+import OrdersPage from "../pages/orders/orders";
+import WishlistPage from "../pages/wishlist/wishlist";
+import FullCartPage from "../pages/cart/cart";
+import SettingsPage from "../pages/settings/settings";
+import SellerInventoryPage from "../pages/seller/inventory";
+import SellerAnalyticsPage from "../pages/seller/analytics";
 
 function AppRoute() {
   return (
@@ -34,6 +40,15 @@ function AppRoute() {
       <Route path="/resetpassword" element={<ResetPassword />} />
 
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/orders" element={<OrdersPage />} />
+      <Route path="/wishlist" element={<WishlistPage />} />
+      <Route path="/cart" element={<FullCartPage />} />
+
+      <Route path="/settings" element={<SettingsPage />} />
+      <Route path="/settings/*" element={<SettingsPage />} />
+
+      <Route path="/seller/inventory" element={<SellerInventoryPage />} />
+      <Route path="/seller/analytics" element={<SellerAnalyticsPage />} />
     </Routes>
   );
 }
