@@ -1,27 +1,40 @@
-const express = require("express");
-const cors = require("cors");
-require("dotenv").config();
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+import authRoutes from "./routes/auth.routes.js";
 
 const app = express();
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 
-// Middleware
-app.use(cors({
-  origin: "http://localhost:5173",
-  credentials: true
-}));
+// Middleware setup
+app.use(
+  cors({
+    origin: FRONTEND_URL,
+    credentials: true,
+  })
+);
 
 app.use(express.json());
+app.use(cookieParser());
 
-// Test route
+// Auth routes
+app.use("/api/auth", authRoutes);
+
+// Server health check route
 app.get("/", (req, res) => {
   res.json({
-    message: "CartForge backend is running"
+    success: true,
+    message: "CartForge backend API server is running",
   });
 });
 
-// Start server
+// Start server listener
 app.listen(PORT, () => {
   console.log(`CartForge server running on http://localhost:${PORT}`);
 });

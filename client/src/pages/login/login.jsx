@@ -1,94 +1,113 @@
-
-import  background from "../../assets/ocean.jpg";
+import background from "../../assets/ocean.jpg";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { login } from "../../service/authservice";
 
-function Login(){
+function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
- const [email,setemail]=useState("");
-  const [password,setpassword]=useState("");
-   const [error,seterror]=useState("");
+  const navigate = useNavigate();
 
-   const navigate= useNavigate();
-   const handleSubmit= async(e)=>{
-    
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
-    useState("");
+    if (!email || !password) {
+      setError("Please fill in all fields");
+      return;
+    }
 
-   if(!email || !password){
-    seterror("Please fill in all fields");
-    return;
-  }
-    
-  if(!email.includes("@")){
-    seterror("Please enter a valid email address");
-    return;
-  }
+    if (!email.includes("@")) {
+      setError("Please enter a valid email address");
+      return;
+    }
 
-  try{
-    const result =await login({email,password});
-    console.log(result);
-    navigate("/loginotp");
-   }
-   catch(error){
-    seterror(error.message);
-   }
-  }
-   
- 
+    try {
+      setLoading(true);
+      const result = await login({ email, password });
+      console.log("Login success:", result);
+      navigate("/loginotp", { state: { email } });
+    } catch (err) {
+      setError(err.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-   
+  return (
+    <div>
+      <img src={background} alt="Background" className="relative w-screen h-screen bg-cover bg-center" />
 
-    return(
-<div>
+      <form
+        onSubmit={handleSubmit}
+        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-md p-8 rounded-lg shadow-xl w-[420px]"
+      >
+        <h2 className="text-2xl font-bold text-center text-blue-800 mb-6">User Login</h2>
 
-    <img src={background} alt="Background" className="relative w-screen h-screen bg-cover bg-center" />
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4 text-sm text-center">
+            {error}
+          </div>
+        )}
 
- <form onSubmit={handleSubmit} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white/10 backdrop-blur-md p-8 rounded-lg shadow-md w-[420px]">
-    <label htmlFor="Login" className="text-2xl flex justify-center align-center text-blue-700 mx-4 my-4">Login</label>
-   <br />
+        <div className="mb-4">
+          <label htmlFor="email" className="block text-sm font-medium text-gray-800 mb-1">
+            Email:
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter your email"
+            className="w-full border border-gray-300 rounded-md px-3 py-2 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+        </div>
 
-   <div className="flex mx-4 my-8">
+        <div className="mb-2">
+          <label htmlFor="password" className="block text-sm font-medium text-gray-800 mb-1">
+            Password:
+          </label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter your password"
+            className="w-full border border-gray-300 rounded-md px-3 py-2 bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+        </div>
 
-      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mx-4">Email:</label>
-    <input type="email" id="email" name="email" value={email} onChange={(e) => setemail(e.target.value)} placeholder="Enter your email"   className="border border-gray-400 rounded-md px-3 py-2 mx-8 " required />
-     
-   </div>
-   <div className="flex mx-4 my-8">
-     <label htmlFor="password" className="block text-sm font-medium text-gray-700  mx-1">Password:</label>
-    <input type="password" id="password" name="password" value={password} onChange={(e) => setpassword(e.target.value)} placeholder="Enter your password"   className="border border-gray-400 rounded-md px-3 py-2 mx-8 " required />
-   
-   </div>
+        <div className="flex justify-end text-sm mb-6">
+          <Link to="/forgetpassword" className="text-blue-700 hover:underline">
+            Forgot Password?
+          </Link>
+        </div>
 
-   <div className="flex justify-end items-end text-sm text-gray-600 my-2 hover:text-blue-500 hover:cursor-pointer hover:underline underline-offset-4">
-     <Link to="/forgetpassword" className="text-blue-500 hover:underline">Forget Password?</Link>
-   
-   </div>
-   
- <div className="flex justify-center items-center mx-auto my-16 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 w-44 rounded">
-   <button type="submit">
-  Submit
-</button>
-   </div>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-bold py-2.5 px-4 rounded transition duration-200 mb-4"
+        >
+          {loading ? "Sending OTP..." : "Login"}
+        </button>
 
-   <div>
-    <p>Don't have an account? <Link to="/signup" className="text-blue-500 hover:underline">Sign up</Link></p>
-   </div>
-    
-  </form>
-
- 
-
-</div>
-
-
-       
-    );
+        <div className="text-center text-sm text-gray-800">
+          Don't have an account?{" "}
+          <Link to="/signup" className="text-blue-700 font-semibold hover:underline">
+            Sign up
+          </Link>
+        </div>
+      </form>
+    </div>
+  );
 }
-
-
-
 
 export default Login;
