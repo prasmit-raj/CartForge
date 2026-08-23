@@ -1,36 +1,53 @@
 import nodemailer from "nodemailer";
 
 /**
- * Creates a Nodemailer transport instance using environment configuration.
+ * Creates a Nodemailer transport instance with explicit timeouts and SSL/TLS handling.
  */
 const createTransporter = () => {
-  const smtpHost = process.env.SMTP_HOST;
-  const smtpPort = Number(process.env.SMTP_PORT) || 587;
   const smtpUser = process.env.SMTP_USER;
   const smtpPass = process.env.SMTP_PASS;
 
-  if (!smtpHost || !smtpUser || !smtpPass) {
+  if (!smtpUser || !smtpPass) {
     return null;
   }
+
+  // If using Gmail, 'service: gmail' is the most reliable preset on cloud hosts (Render/Heroku/AWS)
+  if (process.env.SMTP_HOST?.includes("gmail") || smtpUser.includes("@gmail.com")) {
+    return nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: smtpUser,
+        pass: smtpPass,
+      },
+      connectionTimeout: 10000, // 10s timeout prevents infinite hanging
+      greetingTimeout: 10000,
+      socketTimeout: 15000,
+    });
+  }
+
+  // Custom SMTP fallback
+  const smtpHost = process.env.SMTP_HOST || "smtp.gmail.com";
+  const smtpPort = Number(process.env.SMTP_PORT) || 465;
 
   return nodemailer.createTransport({
     host: smtpHost,
     port: smtpPort,
-    secure: smtpPort === 465, // true for 465, false for other ports
+    secure: smtpPort === 465,
     auth: {
       user: smtpUser,
       pass: smtpPass,
     },
+    tls: {
+      rejectUnauthorized: false, // Prevents TLS handshake blocks
+    },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
   });
 };
 
 /**
  * Sends an email using Nodemailer or logs to console if SMTP is unconfigured in dev mode.
- * @param {Object} options Email configuration options
- * @param {string} options.to Recipient email address
- * @param {string} options.subject Email subject line
- * @param {string} options.text Plain text content
- * @param {string} options.html HTML formatted content
  */
 export const sendEmail = async ({ to, subject, text, html }) => {
   const transporter = createTransporter();
