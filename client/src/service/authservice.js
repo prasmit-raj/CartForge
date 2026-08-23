@@ -2,7 +2,7 @@ import { apiRequest } from "./api";
 
 // login function
 export const login = async (data) => {
-  return apiRequest("/auth/login", {
+  return apiRequest("/api/auth/login", {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -10,7 +10,7 @@ export const login = async (data) => {
 
 // signup function
 export const signup = async (data) => {
-  return apiRequest("/auth/signup", {
+  return apiRequest("/api/auth/signup", {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -18,7 +18,7 @@ export const signup = async (data) => {
 
 // logout function
 export const logout = async () => {
-  return apiRequest("/auth/logout", {
+  return apiRequest("/api/auth/logout", {
     method: "POST",
     body: JSON.stringify({}),
   });
@@ -26,7 +26,7 @@ export const logout = async () => {
 
 // resend login otp
 export const loginotp = async (data) => {
-  return apiRequest("/auth/loginotp", {
+  return apiRequest("/api/auth/loginotp", {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -34,7 +34,7 @@ export const loginotp = async (data) => {
 
 // verify login otp
 export const verifyloginotp = async (data) => {
-  return apiRequest("/auth/verifyloginotp", {
+  return apiRequest("/api/auth/verifyloginotp", {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -42,7 +42,7 @@ export const verifyloginotp = async (data) => {
 
 // resend signup otp
 export const signupotp = async (data) => {
-  return apiRequest("/auth/signupotp", {
+  return apiRequest("/api/auth/signupotp", {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -50,7 +50,7 @@ export const signupotp = async (data) => {
 
 // verify signup otp
 export const verifysignupotp = async (data) => {
-  return apiRequest("/auth/verifysignupotp", {
+  return apiRequest("/api/auth/verifysignupotp", {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -58,7 +58,7 @@ export const verifysignupotp = async (data) => {
 
 // send forgot password otp
 export const sendforgotpasswordotp = async (data) => {
-  return apiRequest("/auth/sendforgotpasswordotp", {
+  return apiRequest("/api/auth/sendforgotpasswordotp", {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -66,7 +66,7 @@ export const sendforgotpasswordotp = async (data) => {
 
 // verify forgot password otp
 export const verifyforgotpasswordotp = async (data) => {
-  return apiRequest("/auth/verifyforgotpasswordotp", {
+  return apiRequest("/api/auth/verifyforgotpasswordotp", {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -74,7 +74,7 @@ export const verifyforgotpasswordotp = async (data) => {
 
 // reset password
 export const resetpassword = async (data) => {
-  return apiRequest("/auth/resetpassword", {
+  return apiRequest("/api/auth/resetpassword", {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -82,7 +82,7 @@ export const resetpassword = async (data) => {
 
 // get current authenticated user profile
 export const getMe = async () => {
-  return apiRequest("/auth/me", {
+  return apiRequest("/api/auth/me", {
     method: "GET",
   });
 };
