@@ -1,68 +1,118 @@
-import nodemailer from "nodemailer";
+import { sendEmail } from "../utils/sendEmail.js";
 
 /**
- * Sends an OTP email to the recipient or logs it to the console in development mode.
- * @param {string} email Target recipient email
+ * Generates clean HTML and text email templates for OTP delivery.
+ * @param {string} otp 6-digit OTP code
+ * @param {string} purpose OTP purpose ('SIGNUP', 'LOGIN', 'RESET_PASSWORD')
+ */
+const getOtpEmailTemplate = (otp, purpose) => {
+  const titles = {
+    SIGNUP: {
+      subject: "CartForge - Verify Your Email Address",
+      heading: "Welcome to CartForge!",
+      subheading: "Please verify your email address to complete registration.",
+      actionText: "Email Verification Code",
+    },
+    LOGIN: {
+      subject: "CartForge - Security Login Code",
+      heading: "CartForge Login Code",
+      subheading: "A login attempt was initiated for your CartForge account.",
+      actionText: "Login Security Code",
+    },
+    RESET_PASSWORD: {
+      subject: "CartForge - Password Reset OTP",
+      heading: "Reset Your Password",
+      subheading: "We received a request to reset your CartForge password.",
+      actionText: "Password Reset Code",
+    },
+  };
+
+  const templateInfo = titles[purpose] || {
+    subject: "CartForge - Security Verification Code",
+    heading: "Security Verification",
+    subheading: "Please use the verification code below to proceed.",
+    actionText: "Verification Code",
+  };
+
+  const textBody = `${templateInfo.heading}\n${templateInfo.subheading}\n\nYour ${templateInfo.actionText} is: ${otp}\nThis code is valid for 10 minutes.\n\nIf you did not request this code, please ignore this email.`;
+
+  const htmlBody = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>${templateInfo.subject}</title>
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;">
+        <tr>
+          <td align="center" style="padding: 40px 10px;">
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 520px; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
+              <!-- Header -->
+              <tr>
+                <td style="background-color: #1e293b; padding: 24px; text-align: center;">
+                  <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 700; letter-spacing: 1px;">🛍️ CartForge</h1>
+                </td>
+              </tr>
+              <!-- Body Content -->
+              <tr>
+                <td style="padding: 32px 28px; color: #334155;">
+                  <h2 style="margin-top: 0; color: #0f172a; font-size: 20px; font-weight: 600;">${templateInfo.heading}</h2>
+                  <p style="font-size: 15px; line-height: 1.5; color: #475569; margin-bottom: 24px;">
+                    ${templateInfo.subheading}
+                  </p>
+                  
+                  <div style="text-align: center; margin: 28px 0;">
+                    <div style="display: inline-block; background-color: #f1f5f9; border: 2px dashed #cbd5e1; border-radius: 10px; padding: 16px 32px;">
+                      <span style="font-family: monospace, Courier; font-size: 34px; font-weight: 700; letter-spacing: 8px; color: #2563eb;">${otp}</span>
+                    </div>
+                    <p style="font-size: 13px; color: #64748b; margin-top: 10px; font-weight: 500;">
+                      ⏱️ This code will expire in <strong>10 minutes</strong>.
+                    </p>
+                  </div>
+
+                  <p style="font-size: 13px; line-height: 1.5; color: #94a3b8; border-top: 1px solid #f1f5f9; padding-top: 16px; margin-bottom: 0;">
+                    If you did not initiate this request, you can safely ignore this email. Someone may have typed your email address by mistake.
+                  </p>
+                </td>
+              </tr>
+              <!-- Footer -->
+              <tr>
+                <td style="background-color: #f8fafc; padding: 16px; text-align: center; border-top: 1px solid #f1f5f9;">
+                  <p style="margin: 0; font-size: 12px; color: #94a3b8;">
+                    © 2026 CartForge eCommerce Inc. All rights reserved.
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+
+  return {
+    subject: templateInfo.subject,
+    text: textBody,
+    html: htmlBody,
+  };
+};
+
+/**
+ * Sends an OTP email to the specified recipient using Nodemailer.
+ * @param {string} email Target recipient email address
  * @param {string} otp 6-digit OTP code
  * @param {string} purpose OTP purpose ('SIGNUP', 'LOGIN', 'RESET_PASSWORD')
  */
 export const sendOtpEmail = async (email, otp, purpose) => {
-  const purposeTitles = {
-    SIGNUP: "CartForge Account Verification OTP",
-    LOGIN: "CartForge Login Security Code",
-    RESET_PASSWORD: "CartForge Password Reset OTP",
-  };
+  const { subject, text, html } = getOtpEmailTemplate(otp, purpose);
 
-  const subject = purposeTitles[purpose] || "CartForge Security Code";
-
-  const textBody = `Your CartForge OTP for ${purpose} is: ${otp}. This code expires in 10 minutes.`;
-
-  const htmlBody = `
-    <div style="font-family: Arial, sans-serif; padding: 20px; color: #333; max-width: 500px; border: 1px solid #e0e0e0; border-radius: 8px;">
-      <h2 style="color: #2563eb;">CartForge Security Code</h2>
-      <p>You requested a one-time verification code for <strong>${purpose}</strong>.</p>
-      <div style="background: #f1f5f9; padding: 16px; text-align: center; border-radius: 6px; margin: 20px 0;">
-        <span style="font-size: 32px; font-weight: bold; letter-spacing: 6px; color: #1e293b;">${otp}</span>
-      </div>
-      <p style="font-size: 14px; color: #64748b;">This OTP is valid for <strong>10 minutes</strong>. Do not share this code with anyone.</p>
-    </div>
-  `;
-
-  // Always log OTP in server logs for convenient development testing
-  console.log("\n=======================================================");
-  console.log(`[EMAIL SERVICE] Sending OTP to: ${email}`);
-  console.log(`[EMAIL SERVICE] Purpose: ${purpose}`);
-  console.log(`[EMAIL SERVICE] OTP CODE: ${otp}`);
-  console.log("=======================================================\n");
-
-  // Attempt real email transport if SMTP config is defined
-  const smtpHost = process.env.SMTP_HOST;
-  const smtpUser = process.env.SMTP_USER;
-  const smtpPass = process.env.SMTP_PASS;
-
-  if (smtpHost && smtpUser && smtpPass) {
-    try {
-      const transporter = nodemailer.createTransport({
-        host: smtpHost,
-        port: Number(process.env.SMTP_PORT) || 587,
-        secure: Number(process.env.SMTP_PORT) === 465,
-        auth: {
-          user: smtpUser,
-          pass: smtpPass,
-        },
-      });
-
-      await transporter.sendMail({
-        from: process.env.FROM_EMAIL || `"CartForge" <${smtpUser}>`,
-        to: email,
-        subject,
-        text: textBody,
-        html: htmlBody,
-      });
-
-      console.log(`[EMAIL SERVICE] Successfully sent email to ${email}`);
-    } catch (error) {
-      console.error(`[EMAIL SERVICE ERROR] Failed to send email via SMTP: ${error.message}`);
-    }
-  }
+  return await sendEmail({
+    to: email,
+    subject,
+    text,
+    html,
+  });
 };
