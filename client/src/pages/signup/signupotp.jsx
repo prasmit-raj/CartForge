@@ -27,7 +27,13 @@ function Signupotp() {
       setLoading(true);
       const result = await verifysignupotp({ email, otp });
       console.log("Signup OTP verified:", result);
-      navigate("/dashboard");
+
+      if (result.success && result.token) {
+        localStorage.setItem("token", result.token);
+        navigate("/dashboard");
+      } else {
+        setError("Signup succeeded, but no authentication token was received.");
+      }
     } catch (err) {
       setError(err.message || "OTP verification failed");
     } finally {

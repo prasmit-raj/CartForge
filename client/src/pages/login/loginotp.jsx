@@ -27,7 +27,13 @@ function Loginotp() {
       setLoading(true);
       const result = await verifyloginotp({ email, otp });
       console.log("Login OTP verified:", result);
-      navigate("/dashboard");
+
+      if (result.success && result.token) {
+        localStorage.setItem("token", result.token);
+        navigate("/dashboard");
+      } else {
+        setError("Login succeeded, but no authentication token was received.");
+      }
     } catch (err) {
       setError(err.message || "OTP verification failed");
     } finally {
