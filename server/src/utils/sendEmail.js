@@ -2,14 +2,15 @@ import { Resend } from "resend";
 import nodemailer from "nodemailer";
 
 export const sendEmail = async ({ to, subject, text, html }) => {
-  const resendApiKey = process.env.RESEND_API_KEY;
+  const emailProvider = process.env.EMAIL_PROVIDER;
 
-  // PRODUCTION / RENDER: USE RESEND ONLY
-  if (process.env.NODE_ENV === "production") {
+  // RENDER: EXPLICITLY USE RESEND
+  if (emailProvider === "resend") {
+    const resendApiKey = process.env.RESEND_API_KEY;
+
+
     if (!resendApiKey) {
-      throw new Error(
-        "RESEND_API_KEY is not available in the running production environment"
-      );
+      throw new Error("RESEND_API_KEY is missing on the server");
     }
 
     try {
@@ -26,7 +27,6 @@ export const sendEmail = async ({ to, subject, text, html }) => {
       });
 
       if (error) {
-        console.error("[RESEND API ERROR]:", error);
         throw new Error(error.message);
       }
 
@@ -36,14 +36,18 @@ export const sendEmail = async ({ to, subject, text, html }) => {
 
       return data;
     } catch (err) {
-      console.error(`[EMAIL SERVICE ERROR] Resend failed for ${to}:`, err.message);
+      console.error(
+        `[EMAIL SERVICE ERROR] Resend failed for ${to}:`,
+        err.message
+      );
+
       throw new Error(`Failed to send OTP email: ${err.message}`);
     }
 
 
   }
 
-  // LOCAL DEVELOPMENT: USE GMAIL
+  // LOCALHOST: USE GMAIL
   if (process.env.SMTP_USER && process.env.SMTP_PASS) {
     try {
       const transporter = nodemailer.createTransport({
@@ -53,7 +57,6 @@ export const sendEmail = async ({ to, subject, text, html }) => {
           pass: process.env.SMTP_PASS,
         },
       });
-
 
       const info = await transporter.sendMail({
         from:
@@ -68,7 +71,11 @@ export const sendEmail = async ({ to, subject, text, html }) => {
       console.log(`[EMAIL SERVICE] Email sent via Gmail to ${to}`);
       return info;
     } catch (err) {
-      console.error(`[EMAIL SERVICE ERROR] Nodemailer failed for ${to}:`, err.message);
+      console.error(
+        `[EMAIL SERVICE ERROR] Nodemailer failed for ${to}:`,
+        err.message
+      );
+
       throw new Error(`Failed to send OTP email: ${err.message}`);
     }
 
