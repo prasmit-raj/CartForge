@@ -102,6 +102,7 @@ const getOtpEmailTemplate = (otp, purpose) => {
 
 /**
  * Sends an OTP email to the specified recipient using Nodemailer.
+ * Features a development bypass fallback logging OTP to console if email sending fails in non-production.
  * @param {string} email Target recipient email address
  * @param {string} otp 6-digit OTP code
  * @param {string} purpose OTP purpose ('SIGNUP', 'LOGIN', 'RESET_PASSWORD')
@@ -109,10 +110,25 @@ const getOtpEmailTemplate = (otp, purpose) => {
 export const sendOtpEmail = async (email, otp, purpose) => {
   const { subject, text, html } = getOtpEmailTemplate(otp, purpose);
 
-  return await sendEmail({
-    to: email,
-    subject,
-    text,
-    html,
-  });
+  try {
+    return await sendEmail({
+      to: email,
+      subject,
+      text,
+      html,
+    });
+  } catch (err) {
+    if (process.env.NODE_ENV !== "production") {
+      console.warn(
+        `\n==================================================` +
+        `\n[DEV OTP BYPASS] Failed to send email to ${email}.` +
+        `\nPurpose: ${purpose}` +
+        `\nOTP Code: ${otp}` +
+        `\nError: ${err.message}` +
+        `\n==================================================\n`
+      );
+      return { devBypass: true, otp };
+    }
+    throw err;
+  }
 };

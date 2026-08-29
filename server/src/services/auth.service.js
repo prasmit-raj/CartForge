@@ -19,6 +19,7 @@ const sanitizeUser = (user) => {
 
 /**
  * SIGNUP USER
+ * Decoupled: Saves user and OTP to DB first, then triggers email asynchronously (non-blocking).
  */
 export const signupUser = async ({ name, email, password }) => {
   const normalizedEmail = email.trim().toLowerCase();
@@ -31,7 +32,7 @@ export const signupUser = async ({ name, email, password }) => {
     if (existingUser.isVerified) {
       throw new Error("An account with this email already exists");
     }
-    // If account exists but is unverified, update password/name and send fresh OTP
+    // If account exists but is unverified, update password/name and issue fresh OTP
     const hashedPassword = await hashPassword(password);
     const updatedUser = await prisma.user.update({
       where: { id: existingUser.id },
@@ -42,7 +43,11 @@ export const signupUser = async ({ name, email, password }) => {
     });
 
     const otp = await createOtp(updatedUser.id, "SIGNUP");
-    await sendOtpEmail(normalizedEmail, otp, "SIGNUP");
+    
+    // Asynchronous fire-and-forget email dispatch
+    sendOtpEmail(normalizedEmail, otp, "SIGNUP").catch((err) => {
+      console.error(`[ASYNC EMAIL ERROR] Failed to deliver SIGNUP OTP to ${normalizedEmail}:`, err.message);
+    });
 
     return {
       message: "Signup OTP sent to email. Please verify your account.",
@@ -62,7 +67,11 @@ export const signupUser = async ({ name, email, password }) => {
   });
 
   const otp = await createOtp(newUser.id, "SIGNUP");
-  await sendOtpEmail(normalizedEmail, otp, "SIGNUP");
+
+  // Asynchronous fire-and-forget email dispatch
+  sendOtpEmail(normalizedEmail, otp, "SIGNUP").catch((err) => {
+    console.error(`[ASYNC EMAIL ERROR] Failed to deliver SIGNUP OTP to ${normalizedEmail}:`, err.message);
+  });
 
   return {
     message: "Signup OTP sent to email. Please verify your account.",
@@ -72,6 +81,7 @@ export const signupUser = async ({ name, email, password }) => {
 
 /**
  * RESEND SIGNUP OTP
+ * Decoupled: Saves new OTP to DB first, then triggers email asynchronously (non-blocking).
  */
 export const resendSignupOtp = async ({ email }) => {
   const normalizedEmail = email.trim().toLowerCase();
@@ -89,7 +99,11 @@ export const resendSignupOtp = async ({ email }) => {
   }
 
   const otp = await createOtp(user.id, "SIGNUP");
-  await sendOtpEmail(normalizedEmail, otp, "SIGNUP");
+
+  // Asynchronous fire-and-forget email dispatch
+  sendOtpEmail(normalizedEmail, otp, "SIGNUP").catch((err) => {
+    console.error(`[ASYNC EMAIL ERROR] Failed to deliver SIGNUP OTP to ${normalizedEmail}:`, err.message);
+  });
 
   return { message: "Signup OTP sent successfully" };
 };
@@ -129,6 +143,7 @@ export const verifySignupOtp = async ({ email, otp }, res) => {
 
 /**
  * LOGIN USER
+ * Decoupled: Saves OTP to DB first, then triggers email asynchronously (non-blocking).
  */
 export const loginUser = async ({ email, password }) => {
   const normalizedEmail = email.trim().toLowerCase();
@@ -147,20 +162,27 @@ export const loginUser = async ({ email, password }) => {
   }
 
   if (!user.isVerified) {
-    // Send signup OTP again if user tries to log in while unverified
+    // Send signup OTP asynchronously if user tries to log in while unverified
     const otp = await createOtp(user.id, "SIGNUP");
-    await sendOtpEmail(normalizedEmail, otp, "SIGNUP");
+    sendOtpEmail(normalizedEmail, otp, "SIGNUP").catch((err) => {
+      console.error(`[ASYNC EMAIL ERROR] Failed to deliver SIGNUP OTP to ${normalizedEmail}:`, err.message);
+    });
     throw new Error("Account is not verified. A verification OTP has been sent to your email.");
   }
 
   const otp = await createOtp(user.id, "LOGIN");
-  await sendOtpEmail(normalizedEmail, otp, "LOGIN");
+
+  // Asynchronous fire-and-forget email dispatch
+  sendOtpEmail(normalizedEmail, otp, "LOGIN").catch((err) => {
+    console.error(`[ASYNC EMAIL ERROR] Failed to deliver LOGIN OTP to ${normalizedEmail}:`, err.message);
+  });
 
   return { message: "Login OTP sent to email. Please verify to complete login." };
 };
 
 /**
  * RESEND LOGIN OTP
+ * Decoupled: Saves OTP to DB first, then triggers email asynchronously (non-blocking).
  */
 export const resendLoginOtp = async ({ email }) => {
   const normalizedEmail = email.trim().toLowerCase();
@@ -178,7 +200,11 @@ export const resendLoginOtp = async ({ email }) => {
   }
 
   const otp = await createOtp(user.id, "LOGIN");
-  await sendOtpEmail(normalizedEmail, otp, "LOGIN");
+
+  // Asynchronous fire-and-forget email dispatch
+  sendOtpEmail(normalizedEmail, otp, "LOGIN").catch((err) => {
+    console.error(`[ASYNC EMAIL ERROR] Failed to deliver LOGIN OTP to ${normalizedEmail}:`, err.message);
+  });
 
   return { message: "Login OTP sent successfully" };
 };
@@ -213,6 +239,7 @@ export const verifyLoginOtp = async ({ email, otp }, res) => {
 
 /**
  * SEND FORGOT PASSWORD OTP
+ * Decoupled: Saves OTP to DB first, then triggers email asynchronously (non-blocking).
  */
 export const sendForgotPasswordOtp = async ({ email }) => {
   const normalizedEmail = email.trim().toLowerCase();
@@ -222,12 +249,16 @@ export const sendForgotPasswordOtp = async ({ email }) => {
   });
 
   if (!user) {
-    // Return generic message for security
+    // Generic response for user privacy/security
     return { message: "If an account with that email exists, a password reset OTP has been sent." };
   }
 
   const otp = await createOtp(user.id, "RESET_PASSWORD");
-  await sendOtpEmail(normalizedEmail, otp, "RESET_PASSWORD");
+
+  // Asynchronous fire-and-forget email dispatch
+  sendOtpEmail(normalizedEmail, otp, "RESET_PASSWORD").catch((err) => {
+    console.error(`[ASYNC EMAIL ERROR] Failed to deliver RESET_PASSWORD OTP to ${normalizedEmail}:`, err.message);
+  });
 
   return { message: "Password reset OTP sent to your email." };
 };
