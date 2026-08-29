@@ -45,6 +45,7 @@ function Signup() {
       }
 
       if (result.token) {
+        localStorage.setItem("token", result.token);
         localStorage.setItem("cartforge_token", result.token);
       }
 

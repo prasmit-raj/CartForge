@@ -13,8 +13,14 @@ export const protect = async (req, res, next) => {
   try {
     let token = req.cookies?.token;
 
-    if (!token && req.headers.authorization?.startsWith("Bearer")) {
-      token = req.headers.authorization.split(" ")[1];
+    const authHeader = req.headers.authorization || req.headers.Authorization;
+
+    if (!token && authHeader) {
+      if (authHeader.toLowerCase().startsWith("bearer ")) {
+        token = authHeader.substring(7).trim();
+      } else {
+        token = authHeader.trim();
+      }
     }
 
     if (!token) {

@@ -112,6 +112,8 @@ export const AppProvider = ({ children }) => {
   // Fetch current user session and sync user role
   useEffect(() => {
     const fetchUser = async () => {
+      const existingToken = localStorage.getItem("token") || localStorage.getItem("cartforge_token");
+
       try {
         const response = await getMe();
         if (response.success && response.data) {
@@ -123,8 +125,13 @@ export const AppProvider = ({ children }) => {
           setRole(computedRole);
         }
       } catch (err) {
-        // Unauthenticated visitor
+        // Unauthenticated visitor or expired token
         setUser(null);
+        if (!existingToken) {
+          // Clean storage if no token existed
+          localStorage.removeItem("token");
+          localStorage.removeItem("cartforge_token");
+        }
       } finally {
         setLoading(false);
       }

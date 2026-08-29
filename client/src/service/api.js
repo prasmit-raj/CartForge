@@ -8,7 +8,8 @@ export const apiRequest = async (endpoint, options = {}) => {
     ? endpoint
     : `/${endpoint}`;
 
-  const token = localStorage.getItem("token");
+  // Retrieve token checking both 'token' and 'cartforge_token' keys for compatibility
+  const token = localStorage.getItem("token") || localStorage.getItem("cartforge_token");
 
   const headers = {
     "Content-Type": "application/json",
