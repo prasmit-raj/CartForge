@@ -6,8 +6,6 @@ import { logout } from "../../service/authservice";
 export default function TopHeader({ onToggleSidebar, user }) {
   const navigate = useNavigate();
   const {
-    role,
-    toggleRole,
     searchQuery,
     setSearchQuery,
     totalCartItems,
@@ -124,22 +122,8 @@ export default function TopHeader({ onToggleSidebar, user }) {
           )}
         </div>
 
-        {/* Right Section: Role Switcher, Wishlist, Cart & Profile Snippet */}
+        {/* Right Section: Wishlist, Cart & Profile Snippet */}
         <div className="flex items-center gap-3">
-          {/* RBAC Role Switcher Toggle */}
-          <button
-            onClick={toggleRole}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow ${
-              role === "SELLER"
-                ? "bg-purple-600 text-white hover:bg-purple-700"
-                : "bg-blue-600 text-white hover:bg-blue-700"
-            }`}
-            title="Switch User Role (Buyer / Seller)"
-          >
-            <span>{role === "SELLER" ? "🏪 Seller Mode" : "🛍️ Buyer Mode"}</span>
-            <span className="text-[10px] bg-black/20 px-1.5 py-0.5 rounded">Switch</span>
-          </button>
-
           {/* Wishlist Quick Access */}
           <Link
             to="/wishlist"
@@ -168,7 +152,7 @@ export default function TopHeader({ onToggleSidebar, user }) {
             )}
           </button>
 
-          {/* User Profile Snippet (retaining current layout style) */}
+          {/* User Profile Snippet */}
           {user && (
             <div className="hidden md:flex items-center gap-3 pl-2 border-l border-slate-800">
               <div className="text-right text-xs">

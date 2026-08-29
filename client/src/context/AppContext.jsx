@@ -109,6 +109,15 @@ export const AppProvider = ({ children }) => {
   // Quick Cart drawer visibility state
   const [isCartOpen, setIsCartOpen] = useState(false);
 
+  // Synchronize role automatically based on authenticated user identity
+  useEffect(() => {
+    if (user?.email?.toLowerCase() === "prasmitraj056@gmail.com" || user?.role === "SELLER") {
+      setRole("SELLER");
+    } else {
+      setRole("BUYER");
+    }
+  }, [user]);
+
   // Fetch current user session and sync user role
   useEffect(() => {
     const fetchUser = async () => {
@@ -128,7 +137,6 @@ export const AppProvider = ({ children }) => {
         // Unauthenticated visitor or expired token
         setUser(null);
         if (!existingToken) {
-          // Clean storage if no token existed
           localStorage.removeItem("token");
           localStorage.removeItem("cartforge_token");
         }
@@ -148,11 +156,6 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     localStorage.setItem("cartforge_wishlist", JSON.stringify(wishlist));
   }, [wishlist]);
-
-  // Role Toggle helper for testing/admin mode
-  const toggleRole = () => {
-    setRole((prev) => (prev === "BUYER" ? "SELLER" : "BUYER"));
-  };
 
   // Cart actions
   const addToCart = (product) => {
@@ -232,7 +235,6 @@ export const AppProvider = ({ children }) => {
         loading,
         role,
         setRole,
-        toggleRole,
         searchQuery,
         setSearchQuery,
         products,
