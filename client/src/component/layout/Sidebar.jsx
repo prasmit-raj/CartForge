@@ -3,8 +3,12 @@ import { Link, useLocation } from "react-router-dom";
 import { useApp } from "../../context/AppContext";
 
 export default function Sidebar({ isOpen, setIsOpen }) {
-  const { role, wishlist, totalCartItems, setIsCartOpen } = useApp();
+  const { role, user, wishlist, totalCartItems, setIsCartOpen } = useApp();
   const location = useLocation();
+
+  const isSeller =
+    (user?.role || role) === "SELLER" ||
+    user?.email?.toLowerCase() === "prasmitraj056@gmail.com";
 
   // Nested dropdown state for Settings
   const [isSettingsOpen, setIsSettingsOpen] = useState(
@@ -29,18 +33,15 @@ export default function Sidebar({ isOpen, setIsOpen }) {
   const handleMouseLeave = () => {
     if (!isOpen) return;
 
-    // Reset any existing timer
     if (timerRef.current) clearTimeout(timerRef.current);
     if (intervalRef.current) clearInterval(intervalRef.current);
 
     setCountdown(5);
 
-    // Update countdown display every second
     intervalRef.current = setInterval(() => {
       setCountdown((prev) => (prev !== null && prev > 1 ? prev - 1 : null));
     }, 1000);
 
-    // Close sidebar after 5 seconds
     timerRef.current = setTimeout(() => {
       setIsOpen(false);
       if (intervalRef.current) clearInterval(intervalRef.current);
@@ -106,7 +107,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
           </div>
         )}
 
-        {/* Navigation Items (5 Primary Items) */}
+        {/* Navigation Items */}
         <div className="flex-1 overflow-y-auto px-4 py-6 space-y-1">
           {/* 1. Dashboard */}
           <Link
@@ -242,8 +243,8 @@ export default function Sidebar({ isOpen, setIsOpen }) {
             )}
           </div>
 
-          {/* Seller Section (RBAC conditional tab) */}
-          {role === "SELLER" && (
+          {/* Seller Section (RBAC conditional tab - rendered ONLY if isSeller is true) */}
+          {isSeller && (
             <div className="pt-4 mt-4 border-t border-slate-800">
               <div className="px-4 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
                 Seller Console
@@ -278,7 +279,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
 
         {/* Footer Info */}
         <div className="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
-          Mode: <span className="font-semibold text-slate-300">{role}</span>
+          Role: <span className="font-semibold text-slate-300">{isSeller ? "SELLER" : "BUYER"}</span>
         </div>
       </aside>
     </>

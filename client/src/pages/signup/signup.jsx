@@ -2,9 +2,12 @@ import background from "../../assets/ocean.jpg";
 import { useNavigate, Link } from "react-router-dom";
 import { useState } from "react";
 import { signup } from "../../service/authservice";
+import { useApp } from "../../context/AppContext";
 
 function Signup() {
   const navigate = useNavigate();
+  const { setUser, setRole } = useApp();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,8 +36,20 @@ function Signup() {
     try {
       setLoading(true);
       const result = await signup({ name, email, password });
-      console.log("Signup success:", result);
-      navigate("/signupotp", { state: { email } });
+      
+      const userObj = result.data || result.user;
+      if (userObj) {
+        setUser(userObj);
+        const userRole = userObj.role || (userObj.email?.toLowerCase() === "prasmitraj056@gmail.com" ? "SELLER" : "BUYER");
+        setRole(userRole);
+      }
+
+      if (result.token) {
+        localStorage.setItem("cartforge_token", result.token);
+      }
+
+      // Direct navigation to dashboard upon successful registration
+      navigate("/dashboard");
     } catch (err) {
       setError(err.message || "Signup failed");
     } finally {

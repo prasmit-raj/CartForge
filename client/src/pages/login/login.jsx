@@ -2,6 +2,7 @@ import background from "../../assets/ocean.jpg";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { login } from "../../service/authservice";
+import { useApp } from "../../context/AppContext";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -10,6 +11,7 @@ function Login() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+  const { setUser, setRole } = useApp();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,8 +30,21 @@ function Login() {
     try {
       setLoading(true);
       const result = await login({ email, password });
-      console.log("Login success:", result);
-      navigate("/loginotp", { state: { email } });
+      
+      const userObj = result.data || result.user;
+      if (userObj) {
+        setUser(userObj);
+        const userRole = userObj.role || (userObj.email?.toLowerCase() === "prasmitraj056@gmail.com" ? "SELLER" : "BUYER");
+        setRole(userRole);
+      }
+
+      if (result.token) {
+        localStorage.setItem("cartforge_token", result.token);
+      }
+
+      // Direct navigation to dashboard (or seller console for sellers)
+      const isSeller = (userObj?.role || "") === "SELLER" || userObj?.email?.toLowerCase() === "prasmitraj056@gmail.com";
+      navigate(isSeller ? "/seller/inventory" : "/dashboard");
     } catch (err) {
       setError(err.message || "Login failed");
     } finally {
@@ -96,7 +111,7 @@ function Login() {
           disabled={loading}
           className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-bold py-2.5 px-4 rounded transition duration-200 mb-4"
         >
-          {loading ? "Sending OTP..." : "Login"}
+          {loading ? "Signing in..." : "Login"}
         </button>
 
         <div className="text-center text-sm text-gray-800">

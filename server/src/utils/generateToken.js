@@ -3,13 +3,14 @@ import jwt from "jsonwebtoken";
 const JWT_SECRET = process.env.JWT_SECRET || "cartforge_dev_secret_key_2026_safe_jwt";
 
 /**
- * Generates a signed JWT token and attaches it to an HTTP-only response cookie.
+ * Generates a signed JWT token containing userId and role, and attaches it to an HTTP-only cookie.
  * @param {Response} res Express response object
  * @param {string} userId User ID payload
+ * @param {string} role User role ('BUYER' | 'SELLER')
  * @returns {string} Signed JWT token
  */
-export const generateTokenAndSetCookie = (res, userId) => {
-  const token = jwt.sign({ id: userId }, JWT_SECRET, {
+export const generateTokenAndSetCookie = (res, userId, role = "BUYER") => {
+  const token = jwt.sign({ id: userId, role }, JWT_SECRET, {
     expiresIn: "7d",
   });
 

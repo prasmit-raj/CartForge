@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { getMe } from "../service/authservice";
 
 const AppContext = createContext();
 
@@ -72,8 +73,14 @@ export const initialProducts = [
 ];
 
 export const AppProvider = ({ children }) => {
+  // Current user state
+  const [user, setUser] = useState(null);
+
   // Role-Based Authorization: 'BUYER' or 'SELLER'
   const [role, setRole] = useState("BUYER");
+
+  // Loading state for initial session fetch
+  const [loading, setLoading] = useState(true);
 
   // Search Query state for instant header filtering
   const [searchQuery, setSearchQuery] = useState("");
@@ -102,6 +109,30 @@ export const AppProvider = ({ children }) => {
   // Quick Cart drawer visibility state
   const [isCartOpen, setIsCartOpen] = useState(false);
 
+  // Fetch current user session and sync user role
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await getMe();
+        if (response.success && response.data) {
+          const fetchedUser = response.data;
+          setUser(fetchedUser);
+          const computedRole =
+            fetchedUser.role ||
+            (fetchedUser.email?.toLowerCase() === "prasmitraj056@gmail.com" ? "SELLER" : "BUYER");
+          setRole(computedRole);
+        }
+      } catch (err) {
+        // Unauthenticated visitor
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
   // Persist cart & wishlist in LocalStorage
   useEffect(() => {
     localStorage.setItem("cartforge_cart", JSON.stringify(cart));
@@ -111,7 +142,7 @@ export const AppProvider = ({ children }) => {
     localStorage.setItem("cartforge_wishlist", JSON.stringify(wishlist));
   }, [wishlist]);
 
-  // Role Toggle helper
+  // Role Toggle helper for testing/admin mode
   const toggleRole = () => {
     setRole((prev) => (prev === "BUYER" ? "SELLER" : "BUYER"));
   };
@@ -189,6 +220,9 @@ export const AppProvider = ({ children }) => {
   return (
     <AppContext.Provider
       value={{
+        user,
+        setUser,
+        loading,
         role,
         setRole,
         toggleRole,

@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import authRoutes from "./routes/auth.routes.js";
+import sellerRoutes from "./routes/seller.routes.js";
 
 const app = express();
 
@@ -47,8 +48,9 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
-// Auth routes
+// Auth & Seller routes
 app.use("/api/auth", authRoutes);
+app.use("/api/seller", sellerRoutes);
 
 // Server health check route
 app.get("/", (req, res) => {
